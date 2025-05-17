@@ -19,6 +19,7 @@ namespace Final_Project.Models
 
         [Required]
         public int NumberOfGuests { get; set; }
+     
 
         [Required]
         [StringLength(20)]
