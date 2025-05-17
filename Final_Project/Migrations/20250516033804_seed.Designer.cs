@@ -4,6 +4,7 @@ using Final_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final_Project.Migrations
 {
     [DbContext(typeof(RestaurantContext))]
-    partial class RestaurantContextModelSnapshot : ModelSnapshot
+    [Migration("20250516033804_seed")]
+    partial class seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -485,7 +488,7 @@ namespace Final_Project.Migrations
                             OrderID = 1,
                             BranchID = 1,
                             CustomerID = 1,
-                            OrderTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6041),
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2163),
                             PaymentMethod = "Credit Card",
                             Status = "Completed",
                             TableID = 1,
@@ -496,7 +499,7 @@ namespace Final_Project.Migrations
                             OrderID = 2,
                             BranchID = 2,
                             CustomerID = 2,
-                            OrderTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6062),
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2174),
                             PaymentMethod = "Cash",
                             Status = "Pending",
                             TableID = 3,
@@ -507,7 +510,7 @@ namespace Final_Project.Migrations
                             OrderID = 3,
                             BranchID = 3,
                             CustomerID = 3,
-                            OrderTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6073),
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2180),
                             PaymentMethod = "Credit Card",
                             Status = "Completed",
                             TotalAmount = 10.98m
@@ -517,7 +520,7 @@ namespace Final_Project.Migrations
                             OrderID = 4,
                             BranchID = 4,
                             CustomerID = 4,
-                            OrderTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6095),
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2187),
                             PaymentMethod = "Cash",
                             Status = "Cancelled",
                             TableID = 4,
@@ -528,7 +531,7 @@ namespace Final_Project.Migrations
                             OrderID = 5,
                             BranchID = 5,
                             CustomerID = 5,
-                            OrderTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6105),
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2193),
                             PaymentMethod = "Credit Card",
                             Status = "Completed",
                             TableID = 5,
@@ -642,7 +645,7 @@ namespace Final_Project.Migrations
                             Amount = 18.98m,
                             OrderID = 1,
                             PaymentMethod = "Credit Card",
-                            PaymentTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6753)
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2574)
                         },
                         new
                         {
@@ -650,7 +653,7 @@ namespace Final_Project.Migrations
                             Amount = 17.98m,
                             OrderID = 2,
                             PaymentMethod = "Cash",
-                            PaymentTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6773)
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2584)
                         },
                         new
                         {
@@ -658,7 +661,7 @@ namespace Final_Project.Migrations
                             Amount = 10.98m,
                             OrderID = 3,
                             PaymentMethod = "Credit Card",
-                            PaymentTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6784)
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2592)
                         },
                         new
                         {
@@ -666,7 +669,7 @@ namespace Final_Project.Migrations
                             Amount = 25.97m,
                             OrderID = 4,
                             PaymentMethod = "Cash",
-                            PaymentTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6793)
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2599)
                         },
                         new
                         {
@@ -674,7 +677,7 @@ namespace Final_Project.Migrations
                             Amount = 13.98m,
                             OrderID = 5,
                             PaymentMethod = "Credit Card",
-                            PaymentTime = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(6800)
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2604)
                         });
                 });
 
@@ -723,7 +726,7 @@ namespace Final_Project.Migrations
                             Gender = "Male",
                             ProfilePictureUrl = "john.jpg",
                             ReceivePromotions = true,
-                            RegisteredDate = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5077)
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1588)
                         },
                         new
                         {
@@ -733,7 +736,7 @@ namespace Final_Project.Migrations
                             Gender = "Female",
                             ProfilePictureUrl = "jane.jpg",
                             ReceivePromotions = false,
-                            RegisteredDate = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5208)
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1697)
                         },
                         new
                         {
@@ -742,7 +745,7 @@ namespace Final_Project.Migrations
                             DateOfBirth = new DateTime(1992, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Gender = "Male",
                             ReceivePromotions = true,
-                            RegisteredDate = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5220)
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1706)
                         },
                         new
                         {
@@ -752,7 +755,7 @@ namespace Final_Project.Migrations
                             Gender = "Female",
                             ProfilePictureUrl = "sara.jpg",
                             ReceivePromotions = true,
-                            RegisteredDate = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5230)
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1712)
                         },
                         new
                         {
@@ -761,7 +764,7 @@ namespace Final_Project.Migrations
                             DateOfBirth = new DateTime(1988, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Gender = "Male",
                             ReceivePromotions = false,
-                            RegisteredDate = new DateTime(2025, 5, 16, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5241)
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1834)
                         });
                 });
 
@@ -868,7 +871,7 @@ namespace Final_Project.Migrations
                             BranchID = 1,
                             CustomerID = 1,
                             NumberOfGuests = 4,
-                            ReservationTime = new DateTime(2025, 5, 17, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5627),
+                            ReservationTime = new DateTime(2025, 5, 17, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1940),
                             Status = "Confirmed"
                         },
                         new
@@ -877,7 +880,7 @@ namespace Final_Project.Migrations
                             BranchID = 2,
                             CustomerID = 2,
                             NumberOfGuests = 6,
-                            ReservationTime = new DateTime(2025, 5, 18, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5670),
+                            ReservationTime = new DateTime(2025, 5, 18, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1953),
                             Status = "Pending"
                         },
                         new
@@ -886,7 +889,7 @@ namespace Final_Project.Migrations
                             BranchID = 3,
                             CustomerID = 3,
                             NumberOfGuests = 2,
-                            ReservationTime = new DateTime(2025, 5, 19, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5682),
+                            ReservationTime = new DateTime(2025, 5, 19, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1959),
                             Status = "Confirmed"
                         },
                         new
@@ -895,7 +898,7 @@ namespace Final_Project.Migrations
                             BranchID = 4,
                             CustomerID = 4,
                             NumberOfGuests = 8,
-                            ReservationTime = new DateTime(2025, 5, 20, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5692),
+                            ReservationTime = new DateTime(2025, 5, 20, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1965),
                             Status = "Cancelled"
                         },
                         new
@@ -904,7 +907,7 @@ namespace Final_Project.Migrations
                             BranchID = 5,
                             CustomerID = 5,
                             NumberOfGuests = 4,
-                            ReservationTime = new DateTime(2025, 5, 21, 6, 42, 6, 355, DateTimeKind.Local).AddTicks(5700),
+                            ReservationTime = new DateTime(2025, 5, 21, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1970),
                             Status = "Confirmed"
                         });
                 });
