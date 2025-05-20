@@ -10,7 +10,8 @@ namespace Final_Project.Models
 
         [Required]
         public int BranchID { get; set; }
-
+        //public int TableID { get; set; }
+        //public string TableStatus { get; set; }
         [Required]
         public int CustomerID { get; set; }
 
