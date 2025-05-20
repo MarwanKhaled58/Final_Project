@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Final_Project.Models;
 
 namespace Final_Project.Models
 {
-    public class RestaurantContext: DbContext
+    public class RestaurantContext : DbContext
     {
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Table> Tables { get; set; }
@@ -19,22 +20,20 @@ namespace Final_Project.Models
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Nutrition> Nutritions { get; set; }
         public DbSet<Profile> Profiles { get; set; }
-        public DbSet<Unit> Units { get; set; }
-        public DbSet<Order2> Orders2 { get; set; }
-        public DbSet<CustomizedOrder> CustomizedOrders { get; set; }
         public RestaurantContext() : base()
         {
-
         }
 
+        public RestaurantContext(DbContextOptions<RestaurantContext> options) : base(options)
+        {
+        }
 
-        //public RestaurantContext(DbContextOptions options) : base(options)
-        //{
-
-        //}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=RestaurantDB;Integrated Security=True;Encrypt=False");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source=DESKTOP-9F3RAET\\SQLEXPRESS;Initial Catalog=FinalDB;Integrated Security=True;Encrypt=False");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -140,46 +139,7 @@ namespace Final_Project.Models
                 new Order { OrderID = 5, BranchID = 5, CustomerID = 5, TableID = 5, OrderTime = DateTime.Now, Status = "Completed", TotalAmount = 13.98m, PaymentMethod = "Credit Card" }
             );
 
-            // Seed Nutritions
-            modelBuilder.Entity<Nutrition>().HasData(
-                new Nutrition { NutritionID = 1, FoodItemID = 1, Calories = 200, Fat = 10m, Carbohydrates = 30m, Fiber = 2m, Sugar = 5m, Protein = 5m },
-                new Nutrition { NutritionID = 2, FoodItemID = 2, Calories = 300, Fat = 15m, Carbohydrates = 10m, Fiber = 1m, Sugar = 2m, Protein = 25m },
-                new Nutrition { NutritionID = 3, FoodItemID = 3, Calories = 400, Fat = 20m, Carbohydrates = 50m, Fiber = 3m, Sugar = 30m, Protein = 5m },
-                new Nutrition { NutritionID = 4, FoodItemID = 4, Calories = 150, Fat = 5m, Carbohydrates = 20m, Fiber = 0m, Sugar = 15m, Protein = 3m },
-                new Nutrition { NutritionID = 5, FoodItemID = 5, Calories = 180, Fat = 8m, Carbohydrates = 15m, Fiber = 4m, Sugar = 3m, Protein = 6m }
-            );
-
-            // Seed Recipes
-            modelBuilder.Entity<Recipe>().HasData(
-                new Recipe { RecipeID = 1, FoodItemID = 1, IngredientID = 2, Quantity = 0.1m },
-                new Recipe { RecipeID = 2, FoodItemID = 2, IngredientID = 1, Quantity = 0.2m },
-                new Recipe { RecipeID = 3, FoodItemID = 3, IngredientID = 3, Quantity = 0.15m },
-                new Recipe { RecipeID = 4, FoodItemID = 4, IngredientID = 4, Quantity = 0.05m },
-                new Recipe { RecipeID = 5, FoodItemID = 5, IngredientID = 5, Quantity = 0.3m }
-            );
-
-            // Seed OrderItems
-            modelBuilder.Entity<OrderItem>().HasData(
-                new OrderItem { OrderItemID = 1, OrderID = 1, FoodItemID = 1, Quantity = 2, Price = 5.99m },
-                new OrderItem { OrderItemID = 2, OrderID = 1, FoodItemID = 2, Quantity = 1, Price = 12.99m },
-                new OrderItem { OrderItemID = 3, OrderID = 2, FoodItemID = 3, Quantity = 2, Price = 4.99m },
-                new OrderItem { OrderItemID = 4, OrderID = 3, FoodItemID = 4, Quantity = 3, Price = 3.99m },
-                new OrderItem { OrderItemID = 5, OrderID = 4, FoodItemID = 5, Quantity = 1, Price = 6.99m }
-            );
-
-            // Seed Payments
-            modelBuilder.Entity<Payment>().HasData(
-                new Payment { PaymentID = 1, OrderID = 1, Amount = 18, PaymentMethod = "Credit Card", PaymentTime = DateTime.Now },
-                new Payment { PaymentID = 2, OrderID = 2, Amount = 17, PaymentMethod = "Cash", PaymentTime = DateTime.Now },
-                new Payment { PaymentID = 3, OrderID = 3, Amount = 10, PaymentMethod = "Credit Card", PaymentTime = DateTime.Now },
-                new Payment { PaymentID = 4, OrderID = 4, Amount = 25, PaymentMethod = "Cash", PaymentTime = DateTime.Now },
-                new Payment { PaymentID = 5, OrderID = 5, Amount = 13, PaymentMethod = "Credit Card", PaymentTime = DateTime.Now }
-            );
-        }
     }
+
+
 }
-
-    
-
-
-

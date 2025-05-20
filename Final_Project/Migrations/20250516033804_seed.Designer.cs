@@ -4,6 +4,7 @@ using Final_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final_Project.Migrations
 {
     [DbContext(typeof(RestaurantContext))]
-    partial class RestaurantContextModelSnapshot : ModelSnapshot
+    [Migration("20250516033804_seed")]
+    partial class seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,6 +129,48 @@ namespace Final_Project.Migrations
                     b.HasKey("CustomerID");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerID = 1,
+                            Address = "321 Elm St",
+                            ContactNumber = "555-0123",
+                            Email = "john.doe@example.com",
+                            Name = "John Doe"
+                        },
+                        new
+                        {
+                            CustomerID = 2,
+                            Address = "654 Pine St",
+                            ContactNumber = "555-0124",
+                            Email = "jane.smith@example.com",
+                            Name = "Jane Smith"
+                        },
+                        new
+                        {
+                            CustomerID = 3,
+                            Address = "987 Cedar St",
+                            ContactNumber = "555-0125",
+                            Email = "ahmed.ali@example.com",
+                            Name = "Ahmed Ali"
+                        },
+                        new
+                        {
+                            CustomerID = 4,
+                            Address = "147 Maple St",
+                            ContactNumber = "555-0126",
+                            Email = "sara.hassan@example.com",
+                            Name = "Sara Hassan"
+                        },
+                        new
+                        {
+                            CustomerID = 5,
+                            Address = "258 Oak St",
+                            ContactNumber = "555-0127",
+                            Email = "omar.khaled@example.com",
+                            Name = "Omar Khaled"
+                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.FoodCategory", b =>
@@ -436,6 +481,62 @@ namespace Final_Project.Migrations
                     b.HasIndex("TableID");
 
                     b.ToTable("Orders");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderID = 1,
+                            BranchID = 1,
+                            CustomerID = 1,
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2163),
+                            PaymentMethod = "Credit Card",
+                            Status = "Completed",
+                            TableID = 1,
+                            TotalAmount = 18.98m
+                        },
+                        new
+                        {
+                            OrderID = 2,
+                            BranchID = 2,
+                            CustomerID = 2,
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2174),
+                            PaymentMethod = "Cash",
+                            Status = "Pending",
+                            TableID = 3,
+                            TotalAmount = 17.98m
+                        },
+                        new
+                        {
+                            OrderID = 3,
+                            BranchID = 3,
+                            CustomerID = 3,
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2180),
+                            PaymentMethod = "Credit Card",
+                            Status = "Completed",
+                            TotalAmount = 10.98m
+                        },
+                        new
+                        {
+                            OrderID = 4,
+                            BranchID = 4,
+                            CustomerID = 4,
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2187),
+                            PaymentMethod = "Cash",
+                            Status = "Cancelled",
+                            TableID = 4,
+                            TotalAmount = 25.97m
+                        },
+                        new
+                        {
+                            OrderID = 5,
+                            BranchID = 5,
+                            CustomerID = 5,
+                            OrderTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2193),
+                            PaymentMethod = "Credit Card",
+                            Status = "Completed",
+                            TableID = 5,
+                            TotalAmount = 13.98m
+                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.OrderItem", b =>
@@ -536,6 +637,48 @@ namespace Final_Project.Migrations
                     b.HasIndex("OrderID");
 
                     b.ToTable("Payments");
+
+                    b.HasData(
+                        new
+                        {
+                            PaymentID = 1,
+                            Amount = 18.98m,
+                            OrderID = 1,
+                            PaymentMethod = "Credit Card",
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2574)
+                        },
+                        new
+                        {
+                            PaymentID = 2,
+                            Amount = 17.98m,
+                            OrderID = 2,
+                            PaymentMethod = "Cash",
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2584)
+                        },
+                        new
+                        {
+                            PaymentID = 3,
+                            Amount = 10.98m,
+                            OrderID = 3,
+                            PaymentMethod = "Credit Card",
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2592)
+                        },
+                        new
+                        {
+                            PaymentID = 4,
+                            Amount = 25.97m,
+                            OrderID = 4,
+                            PaymentMethod = "Cash",
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2599)
+                        },
+                        new
+                        {
+                            PaymentID = 5,
+                            Amount = 13.98m,
+                            OrderID = 5,
+                            PaymentMethod = "Credit Card",
+                            PaymentTime = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(2604)
+                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Profile", b =>
@@ -573,6 +716,56 @@ namespace Final_Project.Migrations
                         .IsUnique();
 
                     b.ToTable("Profiles");
+
+                    b.HasData(
+                        new
+                        {
+                            ProfileID = 1,
+                            CustomerID = 1,
+                            DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Gender = "Male",
+                            ProfilePictureUrl = "john.jpg",
+                            ReceivePromotions = true,
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1588)
+                        },
+                        new
+                        {
+                            ProfileID = 2,
+                            CustomerID = 2,
+                            DateOfBirth = new DateTime(1985, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Gender = "Female",
+                            ProfilePictureUrl = "jane.jpg",
+                            ReceivePromotions = false,
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1697)
+                        },
+                        new
+                        {
+                            ProfileID = 3,
+                            CustomerID = 3,
+                            DateOfBirth = new DateTime(1992, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Gender = "Male",
+                            ReceivePromotions = true,
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1706)
+                        },
+                        new
+                        {
+                            ProfileID = 4,
+                            CustomerID = 4,
+                            DateOfBirth = new DateTime(1995, 11, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Gender = "Female",
+                            ProfilePictureUrl = "sara.jpg",
+                            ReceivePromotions = true,
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1712)
+                        },
+                        new
+                        {
+                            ProfileID = 5,
+                            CustomerID = 5,
+                            DateOfBirth = new DateTime(1988, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Gender = "Male",
+                            ReceivePromotions = false,
+                            RegisteredDate = new DateTime(2025, 5, 16, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1834)
+                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Recipe", b =>
@@ -670,6 +863,53 @@ namespace Final_Project.Migrations
                     b.HasIndex("CustomerID");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            ReservationID = 1,
+                            BranchID = 1,
+                            CustomerID = 1,
+                            NumberOfGuests = 4,
+                            ReservationTime = new DateTime(2025, 5, 17, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1940),
+                            Status = "Confirmed"
+                        },
+                        new
+                        {
+                            ReservationID = 2,
+                            BranchID = 2,
+                            CustomerID = 2,
+                            NumberOfGuests = 6,
+                            ReservationTime = new DateTime(2025, 5, 18, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1953),
+                            Status = "Pending"
+                        },
+                        new
+                        {
+                            ReservationID = 3,
+                            BranchID = 3,
+                            CustomerID = 3,
+                            NumberOfGuests = 2,
+                            ReservationTime = new DateTime(2025, 5, 19, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1959),
+                            Status = "Confirmed"
+                        },
+                        new
+                        {
+                            ReservationID = 4,
+                            BranchID = 4,
+                            CustomerID = 4,
+                            NumberOfGuests = 8,
+                            ReservationTime = new DateTime(2025, 5, 20, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1965),
+                            Status = "Cancelled"
+                        },
+                        new
+                        {
+                            ReservationID = 5,
+                            BranchID = 5,
+                            CustomerID = 5,
+                            NumberOfGuests = 4,
+                            ReservationTime = new DateTime(2025, 5, 21, 6, 37, 58, 340, DateTimeKind.Local).AddTicks(1970),
+                            Status = "Confirmed"
+                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Role", b =>
