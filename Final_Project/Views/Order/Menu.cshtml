@@ -1,0 +1,32 @@
+﻿@model List<Final_Project.Models.FoodCategory>
+
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<h2>Our Menu</h2>
+
+<div class="container">
+    @foreach (var category in Model)
+    {
+        <h3>@category.CategoryName</h3>
+        <div class="row">
+            @foreach (var item in category.FoodItems)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text">@item.Description</p>
+                            <p class="card-text"><strong>Price: $@item.Price</strong></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-lg">Order Now</a>
+</div>

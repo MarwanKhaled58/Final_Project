@@ -10,7 +10,6 @@ namespace Final_Project.Models
         public string CustomerName { get; set; }
         public int CustomerNumber { get; set; }
         public float TotalPrice { get; set; }
-        public List<Unit> Units { get; set; }
         public List<CustomizedOrder> CustomizedOrders { get; set; }
     }
 }

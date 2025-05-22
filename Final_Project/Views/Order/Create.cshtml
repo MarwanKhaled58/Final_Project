@@ -1,0 +1,140 @@
+﻿@model Final_Project.ViewModels.CreateOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<h2>Create New Order</h2>
+
+<form asp-action="SaveNew">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="BranchID" class="control-label">Branch</label>
+                <select asp-for="BranchID" class="form-control" asp-items="ViewBag.BranchID"></select>
+                <span asp-validation-for="BranchID" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TableID" class="control-label">Table (Optional)</label>
+                <input asp-for="TableID" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PaymentMethod" class="control-label">Payment Method</label>
+                <select asp-for="PaymentMethod" class="form-control">
+                    <option value="Cash">Cash</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Debit Card">Debit Card</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <h4>Order Items</h4>
+    <div id="orderItems">
+        <!-- Order items will be added here -->
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <select id="foodItemSelect" class="form-control">
+                    @foreach (var item in Model.AvailableFoodItems)
+                    {
+                        <option value="@item.FoodItemID" data-price="@item.Price" data-name="@item.Name">
+                            @item.Name - $@item.Price
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="quantityInput" class="form-control" value="1" min="1" />
+        </div>
+        <div class="col-md-2">
+            <button type="button" id="addItemBtn" class="btn btn-secondary">Add Item</button>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Total Amount: </label>
+                <span id="totalAmount">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Create Order" class="btn btn-primary" />
+        <a asp-action="Menu" class="btn btn-secondary">Back to Menu</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let itemCounter = 0;
+            let totalAmount = 0;
+
+            // Add item to order
+            $("#addItemBtn").click(function() {
+                const foodItemId = $("#foodItemSelect").val();
+                const foodItemName = $("#foodItemSelect option:selected").data("name");
+                const price = $("#foodItemSelect option:selected").data("price");
+                const quantity = $("#quantityInput").val();
+
+                if (quantity > 0) {
+                    const itemTotal = price * quantity;
+                    totalAmount += itemTotal;
+
+                    // Add item to the order items div
+                    $("#orderItems").append(`
+                        <div class="card mb-2 order-item" data-item-total="${itemTotal}">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <input type="hidden" name="OrderItems[${itemCounter}].FoodItemID" value="${foodItemId}" />
+                                        <input type="hidden" name="OrderItems[${itemCounter}].Name" value="${foodItemName}" />
+                                        <input type="hidden" name="OrderItems[${itemCounter}].Price" value="${price}" />
+                                        <input type="hidden" name="OrderItems[${itemCounter}].Quantity" value="${quantity}" />
+                                        <strong>${foodItemName}</strong>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span>$${price}</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span>x ${quantity}</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span>$${itemTotal.toFixed(2)}</span>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-sm btn-danger remove-item">X</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                    itemCounter++;
+                    updateTotal();
+                }
+            });
+
+            // Remove item from order
+            $(document).on("click", ".remove-item", function() {
+                const itemTotal = parseFloat($(this).closest(".order-item").data("item-total"));
+                totalAmount -= itemTotal;
+                $(this).closest(".order-item").remove();
+                updateTotal();
+            });
+
+            // Update total amount
+            function updateTotal() {
+                $("#totalAmount").text("$" + totalAmount.toFixed(2));
+            }
+        });
+    </script>
+}

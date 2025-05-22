@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Final_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class name : Migration
+    public partial class g : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,6 +71,23 @@ namespace Final_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders_2",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TableID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerNumber = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders_2", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -81,6 +98,23 @@ namespace Final_Project.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.RoleID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Units",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<float>(type: "real(18)", precision: 18, scale: 2, nullable: false),
+                    DescriptionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Units", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,7 +136,7 @@ namespace Final_Project.Migrations
                         column: x => x.BranchID,
                         principalTable: "Branches",
                         principalColumn: "BranchID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -126,7 +160,7 @@ namespace Final_Project.Migrations
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -149,13 +183,13 @@ namespace Final_Project.Migrations
                         column: x => x.BranchID,
                         principalTable: "Branches",
                         principalColumn: "BranchID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -165,7 +199,7 @@ namespace Final_Project.Migrations
                     FoodItemID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     FoodCategoryID = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
@@ -177,7 +211,7 @@ namespace Final_Project.Migrations
                         column: x => x.FoodCategoryID,
                         principalTable: "FoodCategories",
                         principalColumn: "CategoryID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,7 +224,7 @@ namespace Final_Project.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ContactNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     RoleID = table.Column<int>(type: "int", nullable: false),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Salary = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,13 +234,38 @@ namespace Final_Project.Migrations
                         column: x => x.BranchID,
                         principalTable: "Branches",
                         principalColumn: "BranchID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Staff_Roles_RoleID",
                         column: x => x.RoleID,
                         principalTable: "Roles",
                         principalColumn: "RoleID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomOrders",
+                columns: table => new
+                {
+                    OrderID = table.Column<int>(type: "int", nullable: false),
+                    UnitID = table.Column<int>(type: "int", nullable: false),
+                    CustomizedOrderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomOrders", x => new { x.OrderID, x.UnitID });
+                    table.ForeignKey(
+                        name: "FK_CustomOrders_Orders_2_OrderID",
+                        column: x => x.OrderID,
+                        principalTable: "Orders_2",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomOrders_Units_UnitID",
+                        column: x => x.UnitID,
+                        principalTable: "Units",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -220,7 +279,7 @@ namespace Final_Project.Migrations
                     TableID = table.Column<int>(type: "int", nullable: true),
                     OrderTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -231,13 +290,13 @@ namespace Final_Project.Migrations
                         column: x => x.BranchID,
                         principalTable: "Branches",
                         principalColumn: "BranchID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_Tables_TableID",
                         column: x => x.TableID,
@@ -253,11 +312,11 @@ namespace Final_Project.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FoodItemID = table.Column<int>(type: "int", nullable: false),
                     Calories = table.Column<int>(type: "int", nullable: false),
-                    Fat = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Carbohydrates = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Fiber = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Sugar = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Protein = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Fat = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Carbohydrates = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Fiber = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Sugar = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Protein = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,7 +326,7 @@ namespace Final_Project.Migrations
                         column: x => x.FoodItemID,
                         principalTable: "FoodItems",
                         principalColumn: "FoodItemID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -278,7 +337,7 @@ namespace Final_Project.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FoodItemID = table.Column<int>(type: "int", nullable: false),
                     IngredientID = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Quantity = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -288,13 +347,13 @@ namespace Final_Project.Migrations
                         column: x => x.FoodItemID,
                         principalTable: "FoodItems",
                         principalColumn: "FoodItemID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Recipes_Ingredients_IngredientID",
                         column: x => x.IngredientID,
                         principalTable: "Ingredients",
                         principalColumn: "IngredientID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -306,7 +365,7 @@ namespace Final_Project.Migrations
                     OrderID = table.Column<int>(type: "int", nullable: false),
                     FoodItemID = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -316,14 +375,14 @@ namespace Final_Project.Migrations
                         column: x => x.FoodItemID,
                         principalTable: "FoodItems",
                         principalColumn: "FoodItemID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderItems_Orders_OrderID",
                         column: x => x.OrderID,
                         principalTable: "Orders",
                         principalColumn: "OrderID",
-                        onDelete: ReferentialAction.NoAction);
-                }); 
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Payments",
@@ -332,7 +391,7 @@ namespace Final_Project.Migrations
                     PaymentID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderID = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PaymentTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -344,8 +403,13 @@ namespace Final_Project.Migrations
                         column: x => x.OrderID,
                         principalTable: "Orders",
                         principalColumn: "OrderID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomOrders_UnitID",
+                table: "CustomOrders",
+                column: "UnitID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FoodItems_FoodCategoryID",
@@ -434,6 +498,9 @@ namespace Final_Project.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CustomOrders");
+
+            migrationBuilder.DropTable(
                 name: "Nutritions");
 
             migrationBuilder.DropTable(
@@ -453,6 +520,12 @@ namespace Final_Project.Migrations
 
             migrationBuilder.DropTable(
                 name: "Staff");
+
+            migrationBuilder.DropTable(
+                name: "Orders_2");
+
+            migrationBuilder.DropTable(
+                name: "Units");
 
             migrationBuilder.DropTable(
                 name: "Orders");

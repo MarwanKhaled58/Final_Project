@@ -1,26 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Final_Project.Models;
+﻿using Final_Project.Models;
+using Final_Project.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Final_Project.Controllers
 {
     public class BranchController : Controller
     {
-        RestaurantContext context = new RestaurantContext();
+        IBranchRepository branchRepo;
+
+        public BranchController(IBranchRepository _branchRepo)
+        {
+            branchRepo = _branchRepo;
+        }
 
         public IActionResult Index()
         {
-            List<Branch> branchList = context.Branches.ToList();
-            return View("Index", branchList);
+            List<Branch> BranchList = branchRepo.GetAll();
+            return View("Index", BranchList);
         }
 
         public IActionResult Details(int id)
         {
-            var branch = context.Branches.FirstOrDefault(b => b.BranchID == id);
-            if (branch == null)
+            Branch Branch = branchRepo.GetById(id);
+            if (Branch == null)
             {
                 return NotFound();
             }
-            return View("Details", branch);
+            return View("Details", Branch);
         }
 
         public IActionResult Create()
@@ -31,10 +37,10 @@ namespace Final_Project.Controllers
         [HttpPost]
         public IActionResult Create(Branch branch)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid == true)
             {
-                context.Branches.Add(branch);
-                context.SaveChanges();
+                branchRepo.Add(branch);
+                branchRepo.Save();
                 return RedirectToAction("Index");
             }
             return View("Create", branch);
@@ -42,21 +48,21 @@ namespace Final_Project.Controllers
 
         public IActionResult Edit(int id)
         {
-            var branch = context.Branches.FirstOrDefault(b => b.BranchID == id);
-            if (branch == null)
+            Branch Branch = branchRepo.GetById(id);
+            if (Branch == null)
             {
                 return NotFound();
             }
-            return View("Edit", branch);
+            return View("Edit", Branch);
         }
 
         [HttpPost]
         public IActionResult Edit(Branch branch)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid == true)
             {
-                context.Branches.Update(branch);
-                context.SaveChanges();
+                branchRepo.Update(branch);
+                branchRepo.Save();
                 return RedirectToAction("Index");
             }
             return View("Edit", branch);
@@ -64,23 +70,19 @@ namespace Final_Project.Controllers
 
         public IActionResult Delete(int id)
         {
-            var branch = context.Branches.FirstOrDefault(b => b.BranchID == id);
-            if (branch == null)
+            Branch Branch = branchRepo.GetById(id);
+            if (Branch == null)
             {
                 return NotFound();
             }
-            return View("Delete", branch);
+            return View("Delete", Branch);
         }
 
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var branch = context.Branches.FirstOrDefault(b => b.BranchID == id);
-            if (branch != null)
-            {
-                context.Branches.Remove(branch);
-                context.SaveChanges();
-            }
+            branchRepo.Delete(id);
+            branchRepo.Save();
             return RedirectToAction("Index");
         }
     }
