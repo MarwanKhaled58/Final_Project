@@ -10,7 +10,6 @@ namespace Final_Project.Models
         public float Price { get; set; }
         public string DescriptionType { get; set; }
         public int? Quantity { get; set; }
-        public List<Order2> Order2s { get; set; }
         public List<CustomizedOrder> CustomizedOrders { get; set; }
     }
 }

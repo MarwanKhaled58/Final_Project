@@ -17,7 +17,7 @@ namespace Final_Project.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -51,48 +51,6 @@ namespace Final_Project.Migrations
                     b.HasKey("BranchID");
 
                     b.ToTable("Branches");
-
-                    b.HasData(
-                        new
-                        {
-                            BranchID = 1,
-                            Address = "123 Main St",
-                            ContactNumber = "555-0101",
-                            ManagerID = 1,
-                            Name = "Downtown Branch"
-                        },
-                        new
-                        {
-                            BranchID = 2,
-                            Address = "456 Oak Ave",
-                            ContactNumber = "555-0102",
-                            ManagerID = 2,
-                            Name = "Uptown Branch"
-                        },
-                        new
-                        {
-                            BranchID = 3,
-                            Address = "789 Beach Rd",
-                            ContactNumber = "555-0103",
-                            ManagerID = 3,
-                            Name = "Seaside Branch"
-                        },
-                        new
-                        {
-                            BranchID = 4,
-                            Address = "101 Central Sq",
-                            ContactNumber = "555-0104",
-                            ManagerID = 4,
-                            Name = "City Center Branch"
-                        },
-                        new
-                        {
-                            BranchID = 5,
-                            Address = "202 Mall St",
-                            ContactNumber = "555-0105",
-                            ManagerID = 5,
-                            Name = "Mall Branch"
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Customer", b =>
@@ -128,6 +86,24 @@ namespace Final_Project.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Final_Project.Models.CustomizedOrder", b =>
+                {
+                    b.Property<int>("OrderID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomizedOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderID", "UnitID");
+
+                    b.HasIndex("UnitID");
+
+                    b.ToTable("CustomOrders");
+                });
+
             modelBuilder.Entity("Final_Project.Models.FoodCategory", b =>
                 {
                     b.Property<int>("CategoryID")
@@ -144,33 +120,6 @@ namespace Final_Project.Migrations
                     b.HasKey("CategoryID");
 
                     b.ToTable("FoodCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            CategoryID = 1,
-                            CategoryName = "Appetizers"
-                        },
-                        new
-                        {
-                            CategoryID = 2,
-                            CategoryName = "Main Course"
-                        },
-                        new
-                        {
-                            CategoryID = 3,
-                            CategoryName = "Desserts"
-                        },
-                        new
-                        {
-                            CategoryID = 4,
-                            CategoryName = "Beverages"
-                        },
-                        new
-                        {
-                            CategoryID = 5,
-                            CategoryName = "Salads"
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.FoodItem", b =>
@@ -195,6 +144,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FoodItemID");
@@ -202,48 +152,6 @@ namespace Final_Project.Migrations
                     b.HasIndex("FoodCategoryID");
 
                     b.ToTable("FoodItems");
-
-                    b.HasData(
-                        new
-                        {
-                            FoodItemID = 1,
-                            Description = "Crispy vegetable rolls",
-                            FoodCategoryID = 1,
-                            Name = "Spring Rolls",
-                            Price = 5.99m
-                        },
-                        new
-                        {
-                            FoodItemID = 2,
-                            Description = "Juicy grilled chicken breast",
-                            FoodCategoryID = 2,
-                            Name = "Grilled Chicken",
-                            Price = 12.99m
-                        },
-                        new
-                        {
-                            FoodItemID = 3,
-                            Description = "Rich chocolate cake",
-                            FoodCategoryID = 3,
-                            Name = "Chocolate Cake",
-                            Price = 4.99m
-                        },
-                        new
-                        {
-                            FoodItemID = 4,
-                            Description = "Chilled coffee with milk",
-                            FoodCategoryID = 4,
-                            Name = "Iced Coffee",
-                            Price = 3.99m
-                        },
-                        new
-                        {
-                            FoodItemID = 5,
-                            Description = "Fresh salad with Caesar dressing",
-                            FoodCategoryID = 5,
-                            Name = "Caesar Salad",
-                            Price = 6.99m
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Ingredient", b =>
@@ -266,38 +174,6 @@ namespace Final_Project.Migrations
                     b.HasKey("IngredientID");
 
                     b.ToTable("Ingredients");
-
-                    b.HasData(
-                        new
-                        {
-                            IngredientID = 1,
-                            Name = "Chicken",
-                            Quantity = 50
-                        },
-                        new
-                        {
-                            IngredientID = 2,
-                            Name = "Flour",
-                            Quantity = 100
-                        },
-                        new
-                        {
-                            IngredientID = 3,
-                            Name = "Chocolate",
-                            Quantity = 20
-                        },
-                        new
-                        {
-                            IngredientID = 4,
-                            Name = "Tomato",
-                            Quantity = 30
-                        },
-                        new
-                        {
-                            IngredientID = 5,
-                            Name = "Lettuce",
-                            Quantity = 40
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Nutrition", b =>
@@ -312,21 +188,26 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Carbohydrates")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Fat")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Fiber")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("FoodItemID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Protein")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Sugar")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("NutritionID");
@@ -335,63 +216,6 @@ namespace Final_Project.Migrations
                         .IsUnique();
 
                     b.ToTable("Nutritions");
-
-                    b.HasData(
-                        new
-                        {
-                            NutritionID = 1,
-                            Calories = 200,
-                            Carbohydrates = 30m,
-                            Fat = 10m,
-                            Fiber = 2m,
-                            FoodItemID = 1,
-                            Protein = 5m,
-                            Sugar = 5m
-                        },
-                        new
-                        {
-                            NutritionID = 2,
-                            Calories = 300,
-                            Carbohydrates = 10m,
-                            Fat = 15m,
-                            Fiber = 1m,
-                            FoodItemID = 2,
-                            Protein = 25m,
-                            Sugar = 2m
-                        },
-                        new
-                        {
-                            NutritionID = 3,
-                            Calories = 400,
-                            Carbohydrates = 50m,
-                            Fat = 20m,
-                            Fiber = 3m,
-                            FoodItemID = 3,
-                            Protein = 5m,
-                            Sugar = 30m
-                        },
-                        new
-                        {
-                            NutritionID = 4,
-                            Calories = 150,
-                            Carbohydrates = 20m,
-                            Fat = 5m,
-                            Fiber = 0m,
-                            FoodItemID = 4,
-                            Protein = 3m,
-                            Sugar = 15m
-                        },
-                        new
-                        {
-                            NutritionID = 5,
-                            Calories = 180,
-                            Carbohydrates = 15m,
-                            Fat = 8m,
-                            Fiber = 4m,
-                            FoodItemID = 5,
-                            Protein = 6m,
-                            Sugar = 3m
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Order", b =>
@@ -425,6 +249,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderID");
@@ -436,6 +261,36 @@ namespace Final_Project.Migrations
                     b.HasIndex("TableID");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.Order2", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CustomerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("TotalPrice")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders_2");
                 });
 
             modelBuilder.Entity("Final_Project.Models.OrderItem", b =>
@@ -453,6 +308,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
@@ -465,48 +321,6 @@ namespace Final_Project.Migrations
                     b.HasIndex("OrderID");
 
                     b.ToTable("OrderItems");
-
-                    b.HasData(
-                        new
-                        {
-                            OrderItemID = 1,
-                            FoodItemID = 1,
-                            OrderID = 1,
-                            Price = 5.99m,
-                            Quantity = 2
-                        },
-                        new
-                        {
-                            OrderItemID = 2,
-                            FoodItemID = 2,
-                            OrderID = 1,
-                            Price = 12.99m,
-                            Quantity = 1
-                        },
-                        new
-                        {
-                            OrderItemID = 3,
-                            FoodItemID = 3,
-                            OrderID = 2,
-                            Price = 4.99m,
-                            Quantity = 2
-                        },
-                        new
-                        {
-                            OrderItemID = 4,
-                            FoodItemID = 4,
-                            OrderID = 3,
-                            Price = 3.99m,
-                            Quantity = 3
-                        },
-                        new
-                        {
-                            OrderItemID = 5,
-                            FoodItemID = 5,
-                            OrderID = 4,
-                            Price = 6.99m,
-                            Quantity = 1
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Payment", b =>
@@ -518,6 +332,7 @@ namespace Final_Project.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("OrderID")
@@ -590,7 +405,8 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("RecipeID");
 
@@ -599,43 +415,6 @@ namespace Final_Project.Migrations
                     b.HasIndex("IngredientID");
 
                     b.ToTable("Recipes");
-
-                    b.HasData(
-                        new
-                        {
-                            RecipeID = 1,
-                            FoodItemID = 1,
-                            IngredientID = 2,
-                            Quantity = 0.1m
-                        },
-                        new
-                        {
-                            RecipeID = 2,
-                            FoodItemID = 2,
-                            IngredientID = 1,
-                            Quantity = 0.2m
-                        },
-                        new
-                        {
-                            RecipeID = 3,
-                            FoodItemID = 3,
-                            IngredientID = 3,
-                            Quantity = 0.15m
-                        },
-                        new
-                        {
-                            RecipeID = 4,
-                            FoodItemID = 4,
-                            IngredientID = 4,
-                            Quantity = 0.05m
-                        },
-                        new
-                        {
-                            RecipeID = 5,
-                            FoodItemID = 5,
-                            IngredientID = 5,
-                            Quantity = 0.3m
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Reservation", b =>
@@ -688,33 +467,6 @@ namespace Final_Project.Migrations
                     b.HasKey("RoleID");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleID = 1,
-                            RoleName = "Manager"
-                        },
-                        new
-                        {
-                            RoleID = 2,
-                            RoleName = "Waiter"
-                        },
-                        new
-                        {
-                            RoleID = 3,
-                            RoleName = "Chef"
-                        },
-                        new
-                        {
-                            RoleID = 4,
-                            RoleName = "Cashier"
-                        },
-                        new
-                        {
-                            RoleID = 5,
-                            RoleName = "Host"
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Staff", b =>
@@ -742,6 +494,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Salary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("StaffID");
@@ -751,53 +504,6 @@ namespace Final_Project.Migrations
                     b.HasIndex("RoleID");
 
                     b.ToTable("Staff");
-
-                    b.HasData(
-                        new
-                        {
-                            StaffID = 1,
-                            BranchID = 1,
-                            ContactNumber = "555-0201",
-                            Name = "Alice Johnson",
-                            RoleID = 1,
-                            Salary = 5000m
-                        },
-                        new
-                        {
-                            StaffID = 2,
-                            BranchID = 2,
-                            ContactNumber = "555-0202",
-                            Name = "Bob Williams",
-                            RoleID = 1,
-                            Salary = 5200m
-                        },
-                        new
-                        {
-                            StaffID = 3,
-                            BranchID = 3,
-                            ContactNumber = "555-0203",
-                            Name = "Clara Lee",
-                            RoleID = 1,
-                            Salary = 5100m
-                        },
-                        new
-                        {
-                            StaffID = 4,
-                            BranchID = 4,
-                            ContactNumber = "555-0204",
-                            Name = "David Kim",
-                            RoleID = 1,
-                            Salary = 5300m
-                        },
-                        new
-                        {
-                            StaffID = 5,
-                            BranchID = 5,
-                            ContactNumber = "555-0205",
-                            Name = "Emma Brown",
-                            RoleID = 1,
-                            Salary = 5400m
-                        });
                 });
 
             modelBuilder.Entity("Final_Project.Models.Table", b =>
@@ -829,48 +535,57 @@ namespace Final_Project.Migrations
                     b.HasIndex("BranchID");
 
                     b.ToTable("Tables");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            TableID = 1,
-                            BranchID = 1,
-                            Capacity = 4,
-                            Location = "Indoor",
-                            Status = "Available"
-                        },
-                        new
-                        {
-                            TableID = 2,
-                            BranchID = 1,
-                            Capacity = 6,
-                            Location = "Outdoor",
-                            Status = "Available"
-                        },
-                        new
-                        {
-                            TableID = 3,
-                            BranchID = 2,
-                            Capacity = 2,
-                            Location = "Indoor",
-                            Status = "Occupied"
-                        },
-                        new
-                        {
-                            TableID = 4,
-                            BranchID = 3,
-                            Capacity = 8,
-                            Location = "Terrace",
-                            Status = "Available"
-                        },
-                        new
-                        {
-                            TableID = 5,
-                            BranchID = 4,
-                            Capacity = 4,
-                            Location = "Indoor",
-                            Status = "Reserved"
-                        });
+            modelBuilder.Entity("Final_Project.Models.Unit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("real(18)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.CustomizedOrder", b =>
+                {
+                    b.HasOne("Final_Project.Models.Order2", "Order")
+                        .WithMany("CustomizedOrders")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Final_Project.Models.Unit", "Unit")
+                        .WithMany("CustomizedOrders")
+                        .HasForeignKey("UnitID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("Final_Project.Models.FoodItem", b =>
@@ -1077,9 +792,19 @@ namespace Final_Project.Migrations
                     b.Navigation("Payments");
                 });
 
+            modelBuilder.Entity("Final_Project.Models.Order2", b =>
+                {
+                    b.Navigation("CustomizedOrders");
+                });
+
             modelBuilder.Entity("Final_Project.Models.Role", b =>
                 {
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.Unit", b =>
+                {
+                    b.Navigation("CustomizedOrders");
                 });
 #pragma warning restore 612, 618
         }

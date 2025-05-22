@@ -1,4 +1,5 @@
 using Final_Project.Models;
+using Final_Project.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Final_Project
@@ -12,19 +13,35 @@ namespace Final_Project
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // Register Entity Framework DbContext
+            builder.Services.AddDbContext<RestaurantContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("cs"));
+            });
+
+            // Register Repository interfaces with their implementations
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+            builder.Services.AddScoped<IFoodCategoryRepository, FoodCategoryRepository>();
+            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+            //builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            //builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            //builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+            //builder.Services.AddScoped<ITableRepository, TableRepository>();
+            //builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            //builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+            //builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
+            //builder.Services.AddScoped<INutritionRepository, NutritionRepository>();
+            //builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            //builder.Services.AddDbContext<RestaurantContext>(options => {
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("cs"));
-            //});
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

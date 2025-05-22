@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final_Project.Migrations
 {
     [DbContext(typeof(RestaurantContext))]
-    [Migration("20250514153501_name")]
-    partial class name
+    [Migration("20250522130402_g")]
+    partial class g
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -89,6 +89,24 @@ namespace Final_Project.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Final_Project.Models.CustomizedOrder", b =>
+                {
+                    b.Property<int>("OrderID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomizedOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderID", "UnitID");
+
+                    b.HasIndex("UnitID");
+
+                    b.ToTable("CustomOrders");
+                });
+
             modelBuilder.Entity("Final_Project.Models.FoodCategory", b =>
                 {
                     b.Property<int>("CategoryID")
@@ -129,6 +147,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FoodItemID");
@@ -172,21 +191,26 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Carbohydrates")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Fat")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Fiber")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("FoodItemID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Protein")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Sugar")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("NutritionID");
@@ -228,6 +252,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderID");
@@ -239,6 +264,36 @@ namespace Final_Project.Migrations
                     b.HasIndex("TableID");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.Order2", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CustomerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("TotalPrice")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders_2");
                 });
 
             modelBuilder.Entity("Final_Project.Models.OrderItem", b =>
@@ -256,6 +311,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
@@ -279,6 +335,7 @@ namespace Final_Project.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("OrderID")
@@ -351,7 +408,8 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("RecipeID");
 
@@ -439,6 +497,7 @@ namespace Final_Project.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Salary")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("StaffID");
@@ -479,6 +538,57 @@ namespace Final_Project.Migrations
                     b.HasIndex("BranchID");
 
                     b.ToTable("Tables");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.Unit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("real(18)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.CustomizedOrder", b =>
+                {
+                    b.HasOne("Final_Project.Models.Order2", "Order")
+                        .WithMany("CustomizedOrders")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Final_Project.Models.Unit", "Unit")
+                        .WithMany("CustomizedOrders")
+                        .HasForeignKey("UnitID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("Final_Project.Models.FoodItem", b =>
@@ -685,9 +795,19 @@ namespace Final_Project.Migrations
                     b.Navigation("Payments");
                 });
 
+            modelBuilder.Entity("Final_Project.Models.Order2", b =>
+                {
+                    b.Navigation("CustomizedOrders");
+                });
+
             modelBuilder.Entity("Final_Project.Models.Role", b =>
                 {
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Final_Project.Models.Unit", b =>
+                {
+                    b.Navigation("CustomizedOrders");
                 });
 #pragma warning restore 612, 618
         }
