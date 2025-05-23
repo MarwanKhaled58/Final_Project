@@ -27,6 +27,7 @@ namespace Final_Project.Models
         
         public virtual ICollection<Reservation> Reservations { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<Order2> CustOrders { get; set; }
     }
 
 

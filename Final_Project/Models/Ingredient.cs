@@ -15,8 +15,13 @@ namespace Final_Project.Models
         [StringLength(20)]
         public int Quantity { get; set; }
 
+        [StringLength(50)]
+        public string Unit { get; set; }  
+
         [StringLength(255)]
-        
+        public string Description { get; set; }
+
+
 
         // Navigation properties
         public virtual ICollection<Recipe> Recipes { get; set; }

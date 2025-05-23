@@ -6,40 +6,72 @@
 
 <h2>Create New Order</h2>
 
-<form asp-action="SaveNew">
+<!-- Display validation summary for general errors -->
+<div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
+
+<!-- Custom error message container -->
+<div id="errorMessages" class="alert alert-danger" style="display: none;">
+    <ul id="errorList"></ul>
+</div>
+
+<!-- Success message container -->
+<div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+<form asp-action="SaveNew" id="orderForm">
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label asp-for="BranchID" class="control-label">Branch</label>
-                <select asp-for="BranchID" class="form-control" asp-items="ViewBag.BranchID"></select>
+                <label asp-for="ContactNumber" class="control-label">Contact Number (Optional)</label>
+                <input asp-for="ContactNumber" class="form-control" placeholder="Enter customer contact number" maxlength="20" />
+                <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                <small class="form-text text-muted">Enter contact number to link order to existing customer</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BranchID" class="control-label">Branch <span class="text-danger">*</span></label>
+                <select asp-for="BranchID" class="form-control" asp-items="ViewBag.BranchID" required>
+                    <option value="">Select Branch</option>
+                </select>
                 <span asp-validation-for="BranchID" class="text-danger"></span>
+                <div class="invalid-feedback">Please select a branch.</div>
             </div>
 
             <div class="form-group">
-                <label asp-for="TableID" class="control-label">Table (Optional)</label>
-                <input asp-for="TableID" class="form-control" />
+                <label asp-for="TableID" class="control-label">Table Number (Optional)</label>
+                <input asp-for="TableID" class="form-control" type="number" min="1" max="100" placeholder="Enter table number" />
+                <span asp-validation-for="TableID" class="text-danger"></span>
+                <div class="invalid-feedback">Please enter a valid table number (1-100).</div>
             </div>
 
             <div class="form-group">
-                <label asp-for="PaymentMethod" class="control-label">Payment Method</label>
-                <select asp-for="PaymentMethod" class="form-control">
+                <label asp-for="PaymentMethod" class="control-label">Payment Method <span class="text-danger">*</span></label>
+                <select asp-for="PaymentMethod" class="form-control" required>
+                    <option value="">Select Payment Method</option>
                     <option value="Cash">Cash</option>
                     <option value="Credit Card">Credit Card</option>
                     <option value="Debit Card">Debit Card</option>
+                    <option value="Digital Wallet">Digital Wallet</option>
                 </select>
+                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                <div class="invalid-feedback">Please select a payment method.</div>
             </div>
         </div>
     </div>
 
-    <h4>Order Items</h4>
+    <h4>Order Items <span class="text-danger">*</span></h4>
     <div id="orderItems">
         <!-- Order items will be added here -->
+    </div>
+    <div id="orderItemsError" class="text-danger" style="display: none;">
+        Please add at least one item to your order.
     </div>
 
     <div class="row mt-3">
         <div class="col-md-6">
             <div class="form-group">
+                <label for="foodItemSelect">Select Food Item</label>
                 <select id="foodItemSelect" class="form-control">
+                    <option value="">Select Food Item</option>
                     @foreach (var item in Model.AvailableFoodItems)
                     {
                         <option value="@item.FoodItemID" data-price="@item.Price" data-name="@item.Name">
@@ -50,25 +82,32 @@
             </div>
         </div>
         <div class="col-md-2">
-            <input type="number" id="quantityInput" class="form-control" value="1" min="1" />
+            <label for="quantityInput">Quantity</label>
+            <input type="number" id="quantityInput" class="form-control" value="1" min="1" max="50" />
+            <div class="invalid-feedback">Quantity must be between 1 and 50.</div>
         </div>
         <div class="col-md-2">
-            <button type="button" id="addItemBtn" class="btn btn-secondary">Add Item</button>
+            <label>&nbsp;</label>
+            <button type="button" id="addItemBtn" class="btn btn-secondary form-control">Add Item</button>
         </div>
     </div>
 
     <div class="row mt-3">
         <div class="col-md-6">
             <div class="form-group">
-                <label>Total Amount: </label>
-                <span id="totalAmount">$0.00</span>
+                <label><strong>Total Amount: </strong></label>
+                <span id="totalAmount" class="h4 text-primary">$0.00</span>
             </div>
         </div>
     </div>
 
-    <div class="form-group mt-3">
-        <input type="submit" value="Create Order" class="btn btn-primary" />
-        <a asp-action="Menu" class="btn btn-secondary">Back to Menu</a>
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+            <i class="fas fa-shopping-cart"></i> Create Order
+        </button>
+        <a asp-action="Menu" class="btn btn-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left"></i> Back to Menu
+        </a>
     </div>
 </form>
 
@@ -78,63 +117,262 @@
             let itemCounter = 0;
             let totalAmount = 0;
 
+            // Hide validation summary initially
+            $('.validation-summary-valid').hide();
+
+            // Form validation function
+            function validateForm() {
+                let isValid = true;
+                let errors = [];
+
+                // Clear previous errors
+                $('.is-invalid').removeClass('is-invalid');
+                $('#errorMessages').hide();
+                $('#errorList').empty();
+                $('#orderItemsError').hide();
+
+                // Validate branch selection
+                if ($('#BranchID').val() === '') {
+                    $('#BranchID').addClass('is-invalid');
+                    errors.push('Please select a branch.');
+                    isValid = false;
+                }
+
+                // Validate payment method
+                if ($('#PaymentMethod').val() === '') {
+                    $('#PaymentMethod').addClass('is-invalid');
+                    errors.push('Please select a payment method.');
+                    isValid = false;
+                }
+
+                // Validate table number if provided
+                const tableId = $('#TableID').val();
+                if (tableId && (tableId < 1 || tableId > 100)) {
+                    $('#TableID').addClass('is-invalid');
+                    errors.push('Table number must be between 1 and 100.');
+                    isValid = false;
+                }
+
+                // Validate contact number format if provided
+                const contactNumber = $('#ContactNumber').val();
+                if (contactNumber && !/^\d{10,20}$/.test(contactNumber.replace(/[\s\-\(\)]/g, ''))) {
+                    $('#ContactNumber').addClass('is-invalid');
+                    errors.push('Contact number must be 10-20 digits.');
+                    isValid = false;
+                }
+
+                // Validate order items
+                if ($('#orderItems .order-item').length === 0) {
+                    $('#orderItemsError').show();
+                    errors.push('Please add at least one item to your order.');
+                    isValid = false;
+                }
+
+                // Display errors if any
+                if (errors.length > 0) {
+                    errors.forEach(error => {
+                        $('#errorList').append(`<li>${error}</li>`);
+                    });
+                    $('#errorMessages').show();
+                    $('html, body').animate({
+                        scrollTop: $('#errorMessages').offset().top - 100
+                    }, 500);
+                }
+
+                return isValid;
+            }
+
+            // Add item validation
+            function validateAddItem() {
+                const foodItemId = $("#foodItemSelect").val();
+                const quantity = parseInt($("#quantityInput").val());
+                let errors = [];
+
+                if (!foodItemId) {
+                    errors.push('Please select a food item.');
+                }
+
+                if (!quantity || quantity < 1 || quantity > 50) {
+                    $('#quantityInput').addClass('is-invalid');
+                    errors.push('Quantity must be between 1 and 50.');
+                } else {
+                    $('#quantityInput').removeClass('is-invalid');
+                }
+
+                // Check for duplicate items
+                const existingItems = $('#orderItems input[name*="FoodItemID"]');
+                let isDuplicate = false;
+                existingItems.each(function() {
+                    if ($(this).val() == foodItemId) {
+                        isDuplicate = true;
+                        errors.push('This item is already in your order. Please remove it first if you want to change the quantity.');
+                    }
+                });
+
+                if (errors.length > 0) {
+                    showTempError(errors.join(' '));
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Show temporary error message
+            function showTempError(message) {
+                $('#errorList').html(`<li>${message}</li>`);
+                $('#errorMessages').show();
+                setTimeout(() => {
+                    $('#errorMessages').fadeOut();
+                }, 3000);
+            }
+
+            // Show success message
+            function showSuccess(message) {
+                $('#successMessage').html(message).show();
+                setTimeout(() => {
+                    $('#successMessage').fadeOut();
+                }, 3000);
+            }
+
             // Add item to order
             $("#addItemBtn").click(function() {
+                if (!validateAddItem()) {
+                    return;
+                }
+
                 const foodItemId = $("#foodItemSelect").val();
                 const foodItemName = $("#foodItemSelect option:selected").data("name");
-                const price = $("#foodItemSelect option:selected").data("price");
-                const quantity = $("#quantityInput").val();
+                const price = parseFloat($("#foodItemSelect option:selected").data("price"));
+                const quantity = parseInt($("#quantityInput").val());
+                const itemTotal = price * quantity;
 
-                if (quantity > 0) {
-                    const itemTotal = price * quantity;
-                    totalAmount += itemTotal;
+                totalAmount += itemTotal;
 
-                    // Add item to the order items div
-                    $("#orderItems").append(`
-                        <div class="card mb-2 order-item" data-item-total="${itemTotal}">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <input type="hidden" name="OrderItems[${itemCounter}].FoodItemID" value="${foodItemId}" />
-                                        <input type="hidden" name="OrderItems[${itemCounter}].Name" value="${foodItemName}" />
-                                        <input type="hidden" name="OrderItems[${itemCounter}].Price" value="${price}" />
-                                        <input type="hidden" name="OrderItems[${itemCounter}].Quantity" value="${quantity}" />
-                                        <strong>${foodItemName}</strong>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span>$${price}</span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span>x ${quantity}</span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span>$${itemTotal.toFixed(2)}</span>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button type="button" class="btn btn-sm btn-danger remove-item">X</button>
-                                    </div>
+                // Add item to the order items div
+                $("#orderItems").append(`
+                    <div class="card mb-2 order-item" data-item-total="${itemTotal}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <input type="hidden" name="OrderItems[${itemCounter}].FoodItemID" value="${foodItemId}" />
+                                    <input type="hidden" name="OrderItems[${itemCounter}].Name" value="${foodItemName}" />
+                                    <input type="hidden" name="OrderItems[${itemCounter}].Price" value="${price}" />
+                                    <input type="hidden" name="OrderItems[${itemCounter}].Quantity" value="${quantity}" />
+                                    <strong>${foodItemName}</strong>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="text-muted">$${price.toFixed(2)} each</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge badge-secondary">Qty: ${quantity}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="font-weight-bold text-success">$${itemTotal.toFixed(2)}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-danger remove-item" title="Remove item">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    `);
+                    </div>
+                `);
 
-                    itemCounter++;
-                    updateTotal();
-                }
+                itemCounter++;
+                updateTotal();
+                $('#orderItemsError').hide();
+
+                // Reset selections
+                $("#foodItemSelect").val("");
+                $("#quantityInput").val(1);
+
+                showSuccess(`${foodItemName} added to your order!`);
             });
 
             // Remove item from order
             $(document).on("click", ".remove-item", function() {
                 const itemTotal = parseFloat($(this).closest(".order-item").data("item-total"));
+                const itemName = $(this).closest(".order-item").find('strong').text();
+
                 totalAmount -= itemTotal;
                 $(this).closest(".order-item").remove();
                 updateTotal();
+
+                showSuccess(`${itemName} removed from your order.`);
+
+                // Reindex the form elements
+                reindexOrderItems();
             });
+
+            // Reindex order items after removal
+            function reindexOrderItems() {
+                $('#orderItems .order-item').each(function(index) {
+                    $(this).find('input[name*="OrderItems["]').each(function() {
+                        const name = $(this).attr('name');
+                        const newName = name.replace(/OrderItems\[\d+\]/, `OrderItems[${index}]`);
+                        $(this).attr('name', newName);
+                    });
+                });
+                itemCounter = $('#orderItems .order-item').length;
+            }
 
             // Update total amount
             function updateTotal() {
                 $("#totalAmount").text("$" + totalAmount.toFixed(2));
             }
+
+            // Form submission validation
+            $('#orderForm').submit(function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Show loading state
+                $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating Order...');
+            });
+
+            // Real-time validation
+            $('#BranchID, #PaymentMethod').change(function() {
+                $(this).removeClass('is-invalid');
+            });
+
+            $('#TableID').on('input', function() {
+                const value = parseInt($(this).val());
+                if (value && (value < 1 || value > 100)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#ContactNumber').on('input', function() {
+                const value = $(this).val();
+                if (value && !/^\d{10,20}$/.test(value.replace(/[\s\-\(\)]/g, ''))) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Enable enter key for adding items
+            $('#quantityInput').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#addItemBtn').click();
+                    e.preventDefault();
+                }
+            });
+
+            $('#foodItemSelect').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#addItemBtn').click();
+                    e.preventDefault();
+                }
+            });
         });
     </script>
+
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 }

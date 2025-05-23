@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final_Project.Migrations
 {
     [DbContext(typeof(RestaurantContext))]
-    [Migration("20250522130402_g")]
-    partial class g
+    [Migration("20250523005544_AddOrder2UnitCustomizedOrder")]
+    partial class AddOrder2UnitCustomizedOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,6 +165,11 @@ namespace Final_Project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IngredientID"));
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -173,6 +178,11 @@ namespace Final_Project.Migrations
                     b.Property<int>("Quantity")
                         .HasMaxLength(20)
                         .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("IngredientID");
 
@@ -274,9 +284,8 @@ namespace Final_Project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CustomerID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CustomerID")
+                        .HasColumnType("int");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -292,6 +301,8 @@ namespace Final_Project.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerID");
 
                     b.ToTable("Orders_2");
                 });
@@ -638,6 +649,17 @@ namespace Final_Project.Migrations
                     b.Navigation("Table");
                 });
 
+            modelBuilder.Entity("Final_Project.Models.Order2", b =>
+                {
+                    b.HasOne("Final_Project.Models.Customer", "Customer")
+                        .WithMany("CustOrders")
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Final_Project.Models.OrderItem", b =>
                 {
                     b.HasOne("Final_Project.Models.FoodItem", "FoodItem")
@@ -760,6 +782,8 @@ namespace Final_Project.Migrations
 
             modelBuilder.Entity("Final_Project.Models.Customer", b =>
                 {
+                    b.Navigation("CustOrders");
+
                     b.Navigation("Orders");
 
                     b.Navigation("Profile")

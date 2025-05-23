@@ -12,16 +12,19 @@ namespace Final_Project.Controllers
         IFoodItemRepository foodItemRepo;
         IFoodCategoryRepository foodCategoryRepo;
         IBranchRepository branchRepo;
+        ICustomerRepository customerRepo;
 
         public OrderController(IOrderRepository _orderRepo,
                               IFoodItemRepository _foodItemRepo,
                               IFoodCategoryRepository _foodCategoryRepo,
-                              IBranchRepository _branchRepo)
+                              IBranchRepository _branchRepo,
+                              ICustomerRepository _customerRepo)
         {
             orderRepo = _orderRepo;
             foodItemRepo = _foodItemRepo;
             foodCategoryRepo = _foodCategoryRepo;
             branchRepo = _branchRepo;
+            customerRepo = _customerRepo;
         }
 
         public IActionResult Index()
@@ -57,46 +60,208 @@ namespace Final_Project.Controllers
         [HttpPost]
         public IActionResult SaveNew(CreateOrderViewModel NewOrder)
         {
-            if (ModelState.IsValid == true)
+            // Custom validation for order items
+            if (NewOrder.OrderItems == null || NewOrder.OrderItems.Count == 0)
             {
-                Order Order = new Order
+                ModelState.AddModelError("OrderItems", "Please add at least one item to your order.");
+            }
+            else
+            {
+                // Validate each order item
+                for (int i = 0; i < NewOrder.OrderItems.Count; i++)
                 {
-                    CustomerID = NewOrder.CustomerID,
-                    BranchID = NewOrder.BranchID,
-                    TableID = NewOrder.TableID,
-                    OrderTime = DateTime.Now,
-                    Status = "Pending",
-                    TotalAmount = NewOrder.OrderItems.Sum(item => item.Price * item.Quantity),
-                    PaymentMethod = NewOrder.PaymentMethod
-                };
+                    var item = NewOrder.OrderItems[i];
 
-                List<OrderItem> OrderItems = new List<OrderItem>();
-                foreach (var item in NewOrder.OrderItems)
-                {
-                    OrderItems.Add(new OrderItem
+                    if (item.Quantity <= 0 || item.Quantity > 50)
                     {
-                        FoodItemID = item.FoodItemID,
-                        Quantity = item.Quantity,
-                        Price = item.Price
-                    });
+                        ModelState.AddModelError($"OrderItems[{i}].Quantity", "Quantity must be between 1 and 50.");
+                    }
+
+                    if (item.Price <= 0)
+                    {
+                        ModelState.AddModelError($"OrderItems[{i}].Price", "Price must be greater than 0.");
+                    }
+
+                    if (string.IsNullOrEmpty(item.Name))
+                    {
+                        ModelState.AddModelError($"OrderItems[{i}].Name", "Item name is required.");
+                    }
+
+                    // Validate that the food item exists
+                    var foodItem = foodItemRepo.GetById(item.FoodItemID);
+                    if (foodItem == null)
+                    {
+                        ModelState.AddModelError($"OrderItems[{i}].FoodItemID", "Selected food item is not valid.");
+                    }
+                    else if (Math.Abs(foodItem.Price - item.Price) > 0.01m) // Allow small decimal differences
+                    {
+                        ModelState.AddModelError($"OrderItems[{i}].Price", "Item price has been modified. Please refresh and try again.");
+                    }
                 }
 
-                orderRepo.AddOrderWithItems(Order, OrderItems);
+                // Check for duplicate items
+                var duplicateItems = NewOrder.OrderItems
+                    .GroupBy(x => x.FoodItemID)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key);
 
-                return RedirectToAction("Index");
+                if (duplicateItems.Any())
+                {
+                    ModelState.AddModelError("OrderItems", "Duplicate items found. Please combine quantities for the same item.");
+                }
             }
 
-            NewOrder.AvailableFoodItems = foodItemRepo.GetAll("FoodCategory");
-            NewOrder.AvailableBranches = branchRepo.GetAll();
-            ViewBag.BranchID = new SelectList(branchRepo.GetAll(), "BranchID", "Name", NewOrder.BranchID);
+            // Validate contact number format if provided
+            if (!string.IsNullOrEmpty(NewOrder.ContactNumber))
+            {
+                var cleanedContact = NewOrder.ContactNumber.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+                if (!System.Text.RegularExpressions.Regex.IsMatch(cleanedContact, @"^\d{10,20}$"))
+                {
+                    ModelState.AddModelError("ContactNumber", "Contact number must be 10-20 digits.");
+                }
+            }
+
+            // Validate branch exists
+            if (NewOrder.BranchID > 0)
+            {
+                var branch = branchRepo.GetById(NewOrder.BranchID);
+                if (branch == null)
+                {
+                    ModelState.AddModelError("BranchID", "Selected branch is not valid.");
+                }
+            }
+
+            // Validate table number if provided
+            if (NewOrder.TableID.HasValue && (NewOrder.TableID.Value < 1 || NewOrder.TableID.Value > 100))
+            {
+                ModelState.AddModelError("TableID", "Table number must be between 1 and 100.");
+            }
+
+            // Validate payment method
+            var validPaymentMethods = new[] { "Cash", "Credit Card", "Debit Card", "Digital Wallet" };
+            if (!string.IsNullOrEmpty(NewOrder.PaymentMethod) && !validPaymentMethods.Contains(NewOrder.PaymentMethod))
+            {
+                ModelState.AddModelError("PaymentMethod", "Selected payment method is not valid.");
+            }
+
+            // Get customer ID from contact number if provided
+            int? customerId = null;
+            if (!string.IsNullOrEmpty(NewOrder.ContactNumber))
+            {
+                try
+                {
+                    customerId = GetCustomerIdByContact(NewOrder.ContactNumber);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("ContactNumber", "Error validating customer contact number.");
+                    // Log the exception here if you have logging configured
+                }
+            }
+
+            // Validate total amount
+            var calculatedTotal = NewOrder.OrderItems?.Sum(item => item.Price * item.Quantity) ?? 0;
+            if (calculatedTotal <= 0)
+            {
+                ModelState.AddModelError("", "Order total must be greater than $0.");
+            }
+            else if (calculatedTotal > 10000) // Set a reasonable maximum
+            {
+                ModelState.AddModelError("", "Order total cannot exceed $10,000.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Order Order = new Order
+                    {
+                        CustomerID = customerId,
+                        BranchID = NewOrder.BranchID,
+                        TableID = NewOrder.TableID,
+                        OrderTime = DateTime.Now,
+                        Status = "Pending",
+                        TotalAmount = calculatedTotal,
+                        PaymentMethod = NewOrder.PaymentMethod
+                    };
+
+                    List<OrderItem> OrderItems = new List<OrderItem>();
+                    foreach (var item in NewOrder.OrderItems)
+                    {
+                        OrderItems.Add(new OrderItem
+                        {
+                            FoodItemID = item.FoodItemID,
+                            Quantity = item.Quantity,
+                            Price = item.Price
+                        });
+                    }
+
+                    orderRepo.AddOrderWithItems(Order, OrderItems);
+
+                    TempData["SuccessMessage"] = $"Order created successfully! Order total: ${calculatedTotal:F2}";
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "An error occurred while creating the order. Please try again.");
+                    // Log the exception here if you have logging configured
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            try
+            {
+                NewOrder.AvailableFoodItems = foodItemRepo.GetAll("FoodCategory");
+                NewOrder.AvailableBranches = branchRepo.GetAll();
+                ViewBag.BranchID = new SelectList(branchRepo.GetAll(), "BranchID", "Name", NewOrder.BranchID);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error loading form data. Please refresh the page.");
+                // Log the exception here if you have logging configured
+            }
 
             return View("Create", NewOrder);
         }
 
         public IActionResult GetFoodItemDetails(int id)
         {
-            FoodItem FoodItem = foodItemRepo.GetById(id);
-            return Json(new { id = FoodItem.FoodItemID, name = FoodItem.Name, price = FoodItem.Price });
+            try
+            {
+                FoodItem FoodItem = foodItemRepo.GetById(id);
+                if (FoodItem == null)
+                {
+                    return Json(new { error = "Food item not found." });
+                }
+                return Json(new
+                {
+                    id = FoodItem.FoodItemID,
+                    name = FoodItem.Name,
+                    price = FoodItem.Price,
+                    success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = "Error retrieving food item details." });
+            }
+        }
+
+        private int? GetCustomerIdByContact(string contactNumber)
+        {
+            if (string.IsNullOrEmpty(contactNumber))
+                return null;
+
+            try
+            {
+                var customer = customerRepo.GetByContactNumber(contactNumber);
+                return customer?.CustomerID;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here if you have logging configured
+                throw new Exception("Error retrieving customer information.", ex);
+            }
         }
     }
 }
