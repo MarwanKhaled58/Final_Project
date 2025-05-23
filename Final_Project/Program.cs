@@ -24,7 +24,7 @@ namespace Final_Project
             builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
             builder.Services.AddScoped<IFoodCategoryRepository, FoodCategoryRepository>();
             builder.Services.AddScoped<IBranchRepository, BranchRepository>();
-            //builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
             //builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             //builder.Services.AddScoped<IStaffRepository, StaffRepository>();
             //builder.Services.AddScoped<ITableRepository, TableRepository>();

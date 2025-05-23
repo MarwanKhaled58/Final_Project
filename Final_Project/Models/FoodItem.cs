@@ -8,6 +8,10 @@ namespace Final_Project.Models
         [Key]
         public int FoodItemID { get; set; }
 
+
+        [Required]
+        public int FoodCategoryID { get; set; }
+
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
@@ -15,16 +19,15 @@ namespace Final_Project.Models
         [Required]
         public decimal Price { get; set; }
 
-        [Required]
-        public int FoodCategoryID { get; set; }
+ 
 
         [StringLength(255)]
         public string Description { get; set; }
+        public string ItemImage { get; set; }
 
         // Navigation properties
         [ForeignKey("FoodCategoryID")]
         public virtual FoodCategory FoodCategory { get; set; }
-        public virtual Nutrition Nutrition { get; set; }
 
         public virtual ICollection<Recipe> Recipes { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Final_Project.Migrations
 {
     /// <inheritdoc />
-    public partial class g : Migration
+    public partial class AddOrder2UnitCustomizedOrder : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,28 +63,13 @@ namespace Final_Project.Migrations
                     IngredientID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Quantity = table.Column<int>(type: "int", maxLength: 20, nullable: false)
+                    Quantity = table.Column<int>(type: "int", maxLength: 20, nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ingredients", x => x.IngredientID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders_2",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TableID = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerNumber = table.Column<int>(type: "int", nullable: false),
-                    TotalPrice = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders_2", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -136,6 +121,29 @@ namespace Final_Project.Migrations
                         column: x => x.BranchID,
                         principalTable: "Branches",
                         principalColumn: "BranchID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders_2",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    TableID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerNumber = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders_2", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_2_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -244,31 +252,6 @@ namespace Final_Project.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomOrders",
-                columns: table => new
-                {
-                    OrderID = table.Column<int>(type: "int", nullable: false),
-                    UnitID = table.Column<int>(type: "int", nullable: false),
-                    CustomizedOrderId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomOrders", x => new { x.OrderID, x.UnitID });
-                    table.ForeignKey(
-                        name: "FK_CustomOrders_Orders_2_OrderID",
-                        column: x => x.OrderID,
-                        principalTable: "Orders_2",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CustomOrders_Units_UnitID",
-                        column: x => x.UnitID,
-                        principalTable: "Units",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -302,6 +285,31 @@ namespace Final_Project.Migrations
                         column: x => x.TableID,
                         principalTable: "Tables",
                         principalColumn: "TableID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomOrders",
+                columns: table => new
+                {
+                    OrderID = table.Column<int>(type: "int", nullable: false),
+                    UnitID = table.Column<int>(type: "int", nullable: false),
+                    CustomizedOrderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomOrders", x => new { x.OrderID, x.UnitID });
+                    table.ForeignKey(
+                        name: "FK_CustomOrders_Orders_2_OrderID",
+                        column: x => x.OrderID,
+                        principalTable: "Orders_2",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomOrders_Units_UnitID",
+                        column: x => x.UnitID,
+                        principalTable: "Units",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -446,6 +454,11 @@ namespace Final_Project.Migrations
                 name: "IX_Orders_TableID",
                 table: "Orders",
                 column: "TableID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_2_CustomerID",
+                table: "Orders_2",
+                column: "CustomerID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderID",

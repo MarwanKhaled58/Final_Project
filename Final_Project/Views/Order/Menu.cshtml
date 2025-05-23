@@ -9,24 +9,165 @@
 <div class="container">
     @foreach (var category in Model)
     {
-        <h3>@category.CategoryName</h3>
+        <h3 class="mb-4 text-center category-header">@category.CategoryName</h3>
         <div class="row">
             @foreach (var item in category.FoodItems)
             {
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 food-item-card">
+                        @if (!string.IsNullOrEmpty(item.ItemImage))
+                        {
+                            <img src="~/Images/FoodItems/@item.ItemImage"
+                                 class="card-img-top food-item-image"
+                                 alt="@item.Name"
+                                 onerror="this.src='~/Images/FoodItems/default.jpg'; this.onerror=null;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top no-image-placeholder d-flex align-items-center justify-content-center">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        }
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title">@item.Name</h5>
-                            <p class="card-text">@item.Description</p>
-                            <p class="card-text"><strong>Price: $@item.Price</strong></p>
+                            <p class="card-text flex-grow-1">
+                                @if (!string.IsNullOrEmpty(item.Description))
+                                {
+                                    @item.Description
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No description available</span>
+                                }
+                            </p>
+                            <div class="mt-auto">
+                                <p class="card-text price-text">
+                                    <strong class="text-success">Price: $@item.Price.ToString("F2")</strong>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
         </div>
+        <hr class="category-divider" />
     }
 </div>
 
 <div class="text-center mt-4">
-    <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-lg">Order Now</a>
+    <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-lg order-now-btn">
+        <i class="fas fa-shopping-cart"></i> Order Now
+    </a>
 </div>
+
+<style>
+    .food-item-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .food-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+    .food-item-image {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 0;
+    }
+
+    .no-image-placeholder {
+        height: 200px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0;
+    }
+
+    .category-header {
+        color: #2c3e50;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 2rem;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #3498db;
+        display: inline-block;
+    }
+
+    .category-divider {
+        border: 0;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #3498db, transparent);
+        margin: 3rem 0;
+    }
+
+    .price-text {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .order-now-btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 25px;
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .order-now-btn:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+    .card-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-text {
+        color: #6c757d;
+        line-height: 1.5;
+    }
+
+    /* Responsive adjustments */
+   (max-width: 768px) {
+        .col-md-4
+
+    {
+        margin-bottom: 1.5rem;
+    }
+
+    .food-item-image,
+    .no-image-placeholder {
+        height: 180px;
+    }
+
+    .category-header {
+        font-size: 1.5rem;
+    }
+
+    }
+
+   (max-width: 576px) {
+        .food-item-image, .no-image-placeholder
+
+    {
+        height: 160px;
+    }
+
+    .order-now-btn {
+        padding: 10px 25px;
+        font-size: 1rem;
+    }
+
+    }
+</style>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

@@ -11,7 +11,7 @@ namespace Final_Project.Models
         [Required]
         public int BranchID { get; set; }
 
-        public int CustomerID { get; set; }
+        public int? CustomerID { get; set; }
 
         public int? TableID { get; set; }
 
