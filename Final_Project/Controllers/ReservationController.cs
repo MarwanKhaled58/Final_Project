@@ -1,166 +1,272 @@
-﻿using System.Linq.Expressions;
-using Final_Project.Models;
+﻿using Final_Project.Models;
 using Final_Project.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Final_Project.Controllers
 {
     public class ReservationController : Controller
     {
-        RestaurantContext context = new();
+        private readonly RestaurantContext _context;
+
+        public ReservationController(RestaurantContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
-            List<Reservation> AllReservations=context.Reservations.ToList();    
-
-            return View();
+            List<Reservation> allReservations = _context.Reservations
+                .Include(r => r.Table)
+                .Include(r => r.Customer)
+                .ToList();
+            return View("Index",allReservations);
         }
+
         public IActionResult Details(int id)
         {
-           Reservation Reservation = context.Reservations.FirstOrDefault(r=>r.ReservationID==id);
-
-            return View();
+            Reservation reservation = _context.Reservations
+                .Include(r => r.Table)
+                .Include(r => r.Customer)
+                .FirstOrDefault(r => r.ReservationID == id);
+            if (reservation == null)
+                return NotFound();
+            return View(reservation);
         }
+
         public IActionResult AddReservation()
         {
-            List<Branch> branches = context.Branches.ToList();
-            MakeReservation makeReservation = new();
-            //makeReservation.Branches= branches;
-
-            return View("AddReservation", makeReservation);
+            var makeReservation = new MakeReservation
+            {
+                //AvailableTables = _context.Tables
+                //    .Where(t => t.Status == "Available")
+                //    .ToList()
+            };
+            return View(makeReservation);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SaveReservation(MakeReservation makeReservation)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Table tableToBeAssigned;
-                    Reservation reservation = new();
-                    reservation.BranchID=makeReservation.BranchID;
-                    reservation.CustomerID = makeReservation.CustomerID;
-                    reservation.ReservationTime = makeReservation.ReservationTime;
-                    reservation.NumberOfGuests = makeReservation.NumberOfGuests;
-                    reservation.Status = "Confirmed";
+                    //if (makeReservation.IsIndoor==true &&makeReservation.NumberOfGuests==)
+                    //{
                     
-                    if(makeReservation.Indoor_Outdoor == true)
-                    {
-                        switch (makeReservation.NumberOfGuests)
-                        {
-                            case 1:
-                                //reservation.TableID = 1;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 2:
-                                //reservation.TableID = 2;
-                                //reservation.TableStatus = "Reserved";
+                    //}
 
-                                break;
-                            case 3:
-                                //reservation.TableID = 3;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 4:
-                                //reservation.TableID = 4;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 5:
-                                //reservation.TableID = 5;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                        }
-                    }
-                    else
+
+                    //Table table = _context.Tables
+                    //    .FirstOrDefault(t => 
+                    //                       t.Capacity >= makeReservation.NumberOfGuests
+                    //                      && t.Location == (makeReservation.IsIndoor ? "Indoor" : "Outdoor")
+                    //                      && t.Status == "Available");
+
+                    //makeReservation.TableID = table.TableID;
+
+                    
+                    Table table = _context.Tables
+                        .FirstOrDefault(t => t.TableID == makeReservation.TableID
+                                          && t.Capacity >= makeReservation.NumberOfGuests
+                                          && t.Location == (makeReservation.IsIndoor ? "Indoor" : "Outdoor")
+                                          && t.Status == "Available");
+
+                    if (table == null)
                     {
-                        switch (makeReservation.NumberOfGuests)
-                        {
-                            case 1:
-                                //reservation.TableID = 1;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 2:
-                                //reservation.TableID = 2;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 3:
-                                //reservation.TableID = 3;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 4:
-                                //reservation.TableID = 4;
-                                //reservation.TableStatus = "Reserved";
-                                break;
-                            case 5:
-                                //reservation.TableID = 5;
-                                //reservation.TableStatus = "Reserved";
-                                break;
+                        ModelState.AddModelError("", "No suitable table available for the selected criteria.");
+                        makeReservation.AvailableTables = _context.Tables
+                            .Where(t => t.Status == "Available")
+                            .ToList();
+                        return View("AddReservation", makeReservation);
                         }
-                    }
+
+                    // Check for reservation conflicts
+                    bool hasConflict = _context.Reservations
+                        .Any(r => r.TableID == table.TableID
+                               && r.ReservationTime == makeReservation.ReservationTime
+                               && r.Status == "Confirmed");
+                    if (hasConflict)
+                    {
+                        ModelState.AddModelError("", "The selected table is already reserved at this time.");
+                        makeReservation.AvailableTables = _context.Tables
+                            .Where(t => t.Status == "Available")
+                            .ToList();
+                        return View("AddReservation", makeReservation);
+                        }
                   
-                        context.SaveChanges();
-                    return RedirectToAction("........");
+                    // Create reservation
+                    Reservation reservation = new()
+                    {
+                        CustomerID = makeReservation.CustomerID,
+                        ReservationTime = makeReservation.ReservationTime,
+                        NumberOfGuests = makeReservation.NumberOfGuests,
+                        Status = "Confirmed",
+                        TableID = table.TableID
+                    };
+
+                    // Update table status
+                    table.Status = "Reserved";
+
+                    _context.Reservations.Add(reservation);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("Key", ex.InnerException.Message);
+                    ModelState.AddModelError("", ex.Message);
                 }
             }
-            //makeReservation.Branches=context.Branches.ToList();
+
+            makeReservation.AvailableTables = _context.Tables
+                .Where(t => t.Status == "Available")
+                .ToList();
             return View("AddReservation", makeReservation);
         }
+
         public IActionResult EditReservation(int id)
         {
-            Reservation reservation = context.Reservations.FirstOrDefault(r => r.ReservationID==id);
-            MakeReservation editreservation= new();
-            //Table table = context.Tables.FirstOrDefault(t=>t.TableID==reservation.TableID);
+            Reservation reservation = _context.Reservations
+                .Include(r => r.Table)
+                .FirstOrDefault(r => r.ReservationID == id);
+            if (reservation == null)
+                return NotFound();
 
-            editreservation.BranchID = reservation.BranchID;
-            editreservation.CustomerID = reservation.CustomerID;
-            editreservation.ReservationTime = reservation.ReservationTime;
-            editreservation.NumberOfGuests = reservation.NumberOfGuests;
-            //editreservation.Indoor_Outdoor = Table.location;
-            //editreservation.TableID = reservation.TableID;
-            //editreservation.TableStatus = reservation.tablestatus;
-            editreservation.Status = reservation.Status;
+            var editReservation = new MakeReservation
+            {
+                ReservationID = reservation.ReservationID,
+                CustomerID = reservation.CustomerID,
+                ReservationTime = reservation.ReservationTime,
+                NumberOfGuests = reservation.NumberOfGuests,
+                IsIndoor = reservation.Table.Location == "Indoor",
+                TableID = reservation.TableID,
+                Status = reservation.Status,
+                AvailableTables = _context.Tables
+                    .Where(t => t.Status == "Available" || t.TableID == reservation.TableID)
+                    .ToList()
+            };
 
-
-            return View("EditReservation", editreservation);
+            return View("EditReservation", editReservation);
         }
-        public IActionResult SaveEditReservation(MakeReservation editreservation)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SaveEditReservation(MakeReservation editReservation)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Reservation reservation=context.Reservations.FirstOrDefault(r=>r.ReservationID==editreservation.Id);
-                    //Table table = context.Tables.FirstOrDefault(t=>t.TableID==reservation.TableID);
+                    Reservation reservation = _context.Reservations
+                        .Include(r => r.Table)
+                        .FirstOrDefault(r => r.ReservationID == editReservation.ReservationID);
+                    if (reservation == null)
+                        return NotFound();
 
+                    // Find a suitable table
+                    Table table = _context.Tables
+                        .FirstOrDefault(t => t.TableID == editReservation.TableID
+                                          && t.Capacity >= editReservation.NumberOfGuests
+                                          && t.Location == (editReservation.IsIndoor ? "Indoor" : "Outdoor")
+                                          && (t.Status == "Available" || t.TableID == reservation.TableID));
 
-                    reservation.BranchID = editreservation.BranchID;
-                    reservation.CustomerID = editreservation.CustomerID;
-                    reservation.ReservationID = editreservation.Id;
-                    reservation.NumberOfGuests = editreservation.NumberOfGuests;
-                    //reservation.tableid = editreservation.TableID;
-                    //reservation.tablestatus = editreservation.TableStatus;
-                    reservation.BranchID = editreservation.BranchID;
-                    reservation.Status = editreservation.Status;
-                    reservation.ReservationTime = editreservation.ReservationTime;
-                    //Table.location = editreservation.Indoor_Outdoor;
+                    if (table == null)
+                    {
+                        ModelState.AddModelError("", "No suitable table available for the selected criteria.");
+                        editReservation.AvailableTables = _context.Tables
+                            .Where(t => t.Status == "Available" || t.TableID == reservation.TableID)
+                            .ToList();
+                        return View("EditReservation", editReservation);
+                    }
 
-                    context.SaveChanges();  
+                    // Check for reservation conflicts
+                    bool hasConflict = _context.Reservations
+                        .Any(r => r.TableID == table.TableID
+                               && r.ReservationTime == editReservation.ReservationTime
+                               && r.Status == "Confirmed"
+                               && r.ReservationID != editReservation.ReservationID);
+                    if (hasConflict)
+                    {
+                        ModelState.AddModelError("", "The selected table is already reserved at this time.");
+                        editReservation.AvailableTables = _context.Tables
+                            .Where(t => t.Status == "Available" || t.TableID == reservation.TableID)
+                            .ToList();
+                        return View("EditReservation", editReservation);
+                    }
 
+                    // Update the original table's status
+                    if (reservation.TableID != table.TableID)
+                    {
+                        reservation.Table.Status = "Available";
+                    }
 
-                    return RedirectToAction("........");
+                    // Update reservation
+                    reservation.CustomerID = editReservation.CustomerID;
+                    reservation.ReservationTime = editReservation.ReservationTime;
+                    reservation.NumberOfGuests = editReservation.NumberOfGuests;
+                    reservation.TableID = table.TableID;
+                    reservation.Status = editReservation.Status;
+
+                    // Update new table's status
+                    table.Status = "Reserved";
+
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("Key", ex.InnerException.Message);
+                    ModelState.AddModelError("", ex.Message);
                 }
             }
-            //Table table = context.Tables.FirstOrDefault(t=>t.TableID==reservation.TableID);
-            //editreservation.Indoor_Outdoor = table.location;
-            return View("EditNutrition", editreservation);
 
+            editReservation.AvailableTables = _context.Tables
+                .Where(t => t.Status == "Available")
+                .ToList();
+            return View("EditReservation", editReservation);
+                }
 
+        public IActionResult CancelReservation(int id)
+        {
+            Reservation reservation = _context.Reservations
+                .Include(r => r.Table)
+                .FirstOrDefault(r => r.ReservationID == id);
+            if (reservation == null)
+                return NotFound();
+
+            return View(reservation);
+            }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmCancelReservation(int id)
+        {
+            try
+            {
+                Reservation reservation = _context.Reservations
+                    .Include(r => r.Table)
+                    .FirstOrDefault(r => r.ReservationID == id);
+                if (reservation == null)
+                    return NotFound();
+
+                // Update reservation status to Canceled
+                reservation.Status = "Canceled";
+
+                // Update table status to Available
+                reservation.Table.Status = "Available";
+
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View("CancelReservation", _context.Reservations
+                    .Include(r => r.Table)
+                    .FirstOrDefault(r => r.ReservationID == id));
+            }
         }
     }
 }
