@@ -1,0 +1,55 @@
+﻿@model List<Final_Project.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Reservations";
+    Layout = "_Layout";
+}
+
+<h1>Reservations</h1>
+
+<p>
+    <a asp-action="AddReservation" class="btn btn-primary">Add New Reservation</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Reservation ID</th>
+            <th>Customer ID</th>
+            <th>Reservation Time</th>
+            <th>Number of Guests</th>
+            <th>Table ID</th>
+            <th>Table Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reservation in Model)
+        {
+            <tr>
+                <td>@reservation.ReservationID</td>
+                <td>@reservation.CustomerID</td>
+                <td>@reservation.ReservationTime.ToString("g")</td>
+                <td>@reservation.NumberOfGuests</td>
+                <td>@reservation.TableID</td>
+                <td>@reservation.Table.Location</td>
+                <td>@reservation.Status</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@reservation.ReservationID" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="EditReservation" asp-route-id="@reservation.ReservationID" class="btn btn-warning btn-sm">Edit</a>
+                    @if (reservation.Status != "Canceled")
+                    {
+                        <a asp-action="CancelReservation" asp-route-id="@reservation.ReservationID" class="btn btn-danger btn-sm">Cancel</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* @section Scripts { *@
+@*     @{ *@
+@*         await Html.RenderPartialAsync("_ValidationScriptsPartial"); *@
+@*     } *@
+@* } *@

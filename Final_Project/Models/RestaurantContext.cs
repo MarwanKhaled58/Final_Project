@@ -5,6 +5,7 @@ namespace Final_Project.Models
 {
     public class RestaurantContext : DbContext
     {
+        public DbSet<Branch2> Branches2 { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Table> Tables { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -24,6 +25,11 @@ namespace Final_Project.Models
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Unit> Units { get; set; }
 
+        public DbSet<Order2> Orders2 { get; set; }
+        public DbSet<CustomizedOrder> CustomizedOrders { get; set; }
+
+
+
         public RestaurantContext() : base()
         {
         }
@@ -32,93 +38,57 @@ namespace Final_Project.Models
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-5GF48P6\\SQLEXPRESS;Initial Catalog=FinalDB;Integrated Security=True;Encrypt=False");
-            }
-        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        optionsBuilder.UseSqlServer("Data Source=DESKTOP-5GF48P6\\SQLEXPRESS;Initial Catalog=FinalDB;Integrated Security=True;Encrypt=False");
+        //    }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
-            // Configure composite primary key for CustomizedOrder
-            modelBuilder.Entity<CustomizedOrder>()
-                .HasKey(co => new { co.OrderID, co.UnitID });
 
-            // Configure the relationships for CustomizedOrder
-            modelBuilder.Entity<CustomizedOrder>()
-                .HasOne(co => co.Order)
-                .WithMany(o => o.CustomizedOrders)
-                .HasForeignKey(co => co.OrderID);
+            // Configure Branch2
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Location)
+                .HasColumnType("geography");
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Location)
+                .HasComputedColumnSql("geography::Point(Latitude, Longitude, 4326)", stored: true);
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Latitude)
+                .HasPrecision(9, 6)
+                .IsRequired();
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Longitude)
+                .HasPrecision(9, 6)
+                .IsRequired();
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+            modelBuilder.Entity<Branch2>()
+                .Property(b => b.Address)
+                .HasMaxLength(200);
 
-            modelBuilder.Entity<CustomizedOrder>()
-                .HasOne(co => co.Unit)
-                .WithMany(u => u.CustomizedOrders)
-                .HasForeignKey(co => co.UnitID);
 
-            // Configure decimal precision for all decimal properties
 
-            // FoodItem
-            modelBuilder.Entity<FoodItem>()
-                .Property(f => f.Price)
-                .HasPrecision(18, 2);
-
-            // Nutrition
-            modelBuilder.Entity<Nutrition>()
-                .Property(n => n.Carbohydrates)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Nutrition>()
-                .Property(n => n.Fat)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Nutrition>()
-                .Property(n => n.Fiber)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Nutrition>()
-                .Property(n => n.Protein)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Nutrition>()
-                .Property(n => n.Sugar)
-                .HasPrecision(18, 2);
-
-            // Order
-            modelBuilder.Entity<Order>()
-                .Property(o => o.TotalAmount)
-                .HasPrecision(18, 2);
-
-            // OrderItem
-            modelBuilder.Entity<OrderItem>()
-                .Property(oi => oi.Price)
-                .HasPrecision(18, 2);
-
-            // Payment
-            modelBuilder.Entity<Payment>()
-                .Property(p => p.Amount)
-                .HasPrecision(18, 2);
-
-            // Recipe
-            modelBuilder.Entity<Recipe>()
-                .Property(r => r.Quantity)
-                .HasPrecision(18, 4); // More decimal places for precise measurements
-
-            // Staff
-            modelBuilder.Entity<Staff>()
-                .Property(s => s.Salary)
-                .HasPrecision(18, 2);
-
-            // Unit (if it has a Price property)
-            modelBuilder.Entity<Unit>()
-                .Property(u => u.Price)
-                .HasPrecision(18, 2);
-
-            // SEED DATA REMOVED - Already exists in database from previous migrations
-            // To avoid primary key constraint violations
+            // Seed Branch2 data
+            modelBuilder.Entity<Branch2>().HasData(
+                new Branch2 { Id = 1, Name = "Downtown Branch", Address = "123 Main St", Latitude = 40.7128, Longitude = -74.0060 },
+                new Branch2 { Id = 2, Name = "Uptown Branch", Address = "456 Oak Ave", Latitude = 40.7831, Longitude = -73.9712 },
+                new Branch2 { Id = 3, Name = "Seaside Branch", Address = "789 Beach Rd", Latitude = 40.6782, Longitude = -73.9442 },
+                new Branch2 { Id = 4, Name = "City Center Branch", Address = "101 Central Sq", Latitude = 40.7484, Longitude = -73.9857 },
+                new Branch2 { Id = 5, Name = "Mall Branch", Address = "202 Mall St", Latitude = 40.7589, Longitude = -73.9891 }
+            );
         }
     }
 }
+        
+
+    
+
+
+
